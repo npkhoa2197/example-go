@@ -3,7 +3,10 @@ package category
 import (
 	"context"
 
+	"github.com/lib/pq"
+
 	"github.com/jinzhu/gorm"
+
 	"github.com/npkhoa2197/example-go/domain"
 )
 
@@ -21,7 +24,18 @@ func NewPGService(db *gorm.DB) Service {
 
 // Create implement Create for Category service
 func (s *pgService) Create(_ context.Context, p *domain.Category) error {
-	return s.db.Create(p).Error
+	err := s.db.Create(p).Error
+	pqError, ok := err.(*pq.Error)
+
+	if !ok {
+		return err
+	}
+
+	if pqError.Code == uniqueError {
+		return ErrCategoryExisted
+	}
+
+	return err
 }
 
 // Update implement Update for Category service
@@ -36,7 +50,18 @@ func (s *pgService) Update(_ context.Context, p *domain.Category) (*domain.Categ
 
 	old.Name = p.Name
 
-	return &old, s.db.Save(&old).Error
+	err := s.db.Save(&old).Error
+	pqError, ok := err.(*pq.Error)
+
+	if !ok {
+		return nil, err
+	}
+
+	if pqError.Code == uniqueError {
+		return nil, ErrCategoryExisted
+	}
+
+	return &old, err
 }
 
 // Find implement Find for Category service
