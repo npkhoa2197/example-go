@@ -92,5 +92,14 @@ func (s *pgService) Delete(_ context.Context, p *domain.Category) error {
 		}
 		return err
 	}
+
+	var books []domain.Book
+
+	s.db.Where("category_id = ?", old.ID).Find(&books)
+
+	for _, book := range books {
+		s.db.Delete(book)
+	}
+
 	return s.db.Delete(old).Error
 }
