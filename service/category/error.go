@@ -6,11 +6,15 @@ import (
 
 // Error Declaration
 var (
-	ErrNotFound       = errNotFound{}
-	ErrUnknown        = errUnknown{}
-	ErrNameIsRequired = errNameIsRequired{}
-	ErrRecordNotFound = errRecordNotFound{}
+	ErrNotFound        = errNotFound{}
+	ErrUnknown         = errUnknown{}
+	ErrNameIsRequired  = errNameIsRequired{}
+	ErrRecordNotFound  = errRecordNotFound{}
+	ErrCategoryExisted = errCategoryExisted{}
+	ErrNameLength      = errNameLength{}
 )
+
+const uniqueError = "23505"
 
 type errNotFound struct{}
 
@@ -42,9 +46,29 @@ func (errRecordNotFound) StatusCode() int {
 type errNameIsRequired struct{}
 
 func (errNameIsRequired) Error() string {
-	return "name is required"
+	return "category name is required"
 }
 
 func (errNameIsRequired) StatusCode() int {
+	return http.StatusBadRequest
+}
+
+type errCategoryExisted struct{}
+
+func (errCategoryExisted) Error() string {
+	return "category name existed"
+}
+
+func (errCategoryExisted) StatusCode() int {
+	return http.StatusBadRequest
+}
+
+type errNameLength struct{}
+
+func (errNameLength) Error() string {
+	return "category name must be longer than 5 characters"
+}
+
+func (errNameLength) StatusCode() int {
 	return http.StatusBadRequest
 }
