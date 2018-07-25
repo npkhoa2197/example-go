@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 
 	"github.com/npkhoa2197/example-go/domain"
 )
@@ -22,7 +23,13 @@ func NewPGService(db *gorm.DB) Service {
 
 // Create implement Create for Book service
 func (s *pgService) Create(_ context.Context, p *domain.Book) error {
-	return s.db.Create(p).Error
+	err := s.db.Create(p).Error
+	pqError, ok := err.(*pq.Error)
+
+	if ok && pqError.Code == foreignKeyError {
+		return ErrCategoryNotExisted
+	}
+	return err
 }
 
 // Update implement Update for Book service
@@ -40,7 +47,14 @@ func (s *pgService) Update(_ context.Context, p *domain.Book) (*domain.Book, err
 	old.Author = p.Author
 	old.Description = p.Description
 
-	return &old, s.db.Save(&old).Error
+	err := s.db.Save(&old).Error
+	pqError, ok := err.(*pq.Error)
+
+	if ok && pqError.Code == foreignKeyError {
+		return &old, ErrCategoryNotExisted
+	}
+
+	return &old, err
 }
 
 // Find implement Find for Book service

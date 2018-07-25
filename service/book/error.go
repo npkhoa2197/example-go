@@ -6,11 +6,14 @@ import (
 
 // Error Declaration
 var (
-	ErrNotFound           = errNotFound{}
-	ErrUnknown            = errUnknown{}
-	ErrNameIsRequired     = errNameIsRequired{}
-	ErrRecordNotFound     = errRecordNotFound{}
-	ErrCategoryNotExisted = errCategoryNotExisted{}
+	ErrNotFound            = errNotFound{}
+	ErrUnknown             = errUnknown{}
+	ErrNameIsRequired      = errNameIsRequired{}
+	ErrDescriptionRequired = errDescriptionRequired{}
+	ErrRecordNotFound      = errRecordNotFound{}
+	ErrCategoryNotExisted  = errCategoryNotExisted{}
+	ErrNameLength          = errNameLength{}
+	ErrDescriptionLength   = errDescriptionLength{}
 )
 
 const foreignKeyError = "23503"
@@ -59,5 +62,35 @@ func (errCategoryNotExisted) Error() string {
 }
 
 func (errCategoryNotExisted) StatusCode() int {
+	return http.StatusBadRequest
+}
+
+type errNameLength struct{}
+
+func (errNameLength) Error() string {
+	return "name must be longer than 5 characters"
+}
+
+func (errNameLength) StatusCode() int {
+	return http.StatusBadRequest
+}
+
+type errDescriptionLength struct{}
+
+func (errDescriptionLength) Error() string {
+	return "description must be longer than 5 characters"
+}
+
+func (errDescriptionLength) StatusCode() int {
+	return http.StatusBadRequest
+}
+
+type errDescriptionRequired struct{}
+
+func (errDescriptionRequired) Error() string {
+	return "description is required "
+}
+
+func (errDescriptionRequired) StatusCode() int {
 	return http.StatusBadRequest
 }
