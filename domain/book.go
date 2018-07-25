@@ -6,5 +6,5 @@ type Book struct {
 	Name        string `json:"name"`
 	CategoryID  UUID   `json:"category_id"`
 	Author      string `json:"author"`
-	Description string `json:"Description"`
+	Description string `json:"description"`
 }
