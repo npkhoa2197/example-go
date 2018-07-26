@@ -6,6 +6,7 @@ import (
 
 	"github.com/npkhoa2197/example-go/endpoints/book"
 	"github.com/npkhoa2197/example-go/endpoints/category"
+	"github.com/npkhoa2197/example-go/endpoints/lendbook"
 	"github.com/npkhoa2197/example-go/endpoints/user"
 )
 
@@ -28,6 +29,12 @@ type Endpoints struct {
 	CreateBook  endpoint.Endpoint
 	UpdateBook  endpoint.Endpoint
 	DeleteBook  endpoint.Endpoint
+
+	FindLendBookRecord    endpoint.Endpoint
+	FindAllLendBookRecord endpoint.Endpoint
+	CreateLendBookRecord  endpoint.Endpoint
+	UpdateLendBookRecord  endpoint.Endpoint
+	DeleteLendBookRecord  endpoint.Endpoint
 }
 
 // MakeServerEndpoints returns an Endpoints struct
@@ -50,5 +57,11 @@ func MakeServerEndpoints(s service.Service) Endpoints {
 		CreateBook:  book.MakeCreateEndpoint(s),
 		UpdateBook:  book.MakeUpdateEndpoint(s),
 		DeleteBook:  book.MakeDeleteEndpoint(s),
+
+		FindLendBookRecord:    lendbook.MakeFindEndPoint(s),
+		FindAllLendBookRecord: lendbook.MakeFindAllEndpoint(s),
+		CreateLendBookRecord:  lendbook.MakeCreateEndpoint(s),
+		UpdateLendBookRecord:  lendbook.MakeUpdateEndpoint(s),
+		DeleteLendBookRecord:  lendbook.MakeDeleteEndpoint(s),
 	}
 }
