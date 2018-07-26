@@ -4,7 +4,7 @@
 
 Submitted by: **npkhoa2197**
 
-Time spent: **{{time_spent}}** hours spent in total
+Time spent: **6** hours spent in total
 
 ## Prerequisite
 
