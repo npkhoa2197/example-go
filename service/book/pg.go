@@ -21,14 +21,21 @@ func NewPGService(db *gorm.DB) Service {
 	}
 }
 
+// Validate foreign key constraint error return from pg. True if there is an error on FK, false otherwise
+func keyNotExisted(err error) bool {
+	pqError, ok := err.(*pq.Error)
+
+	return ok && pqError.Code == foreignKeyError
+}
+
 // Create implement Create for Book service
 func (s *pgService) Create(_ context.Context, p *domain.Book) error {
 	err := s.db.Create(p).Error
-	pqError, ok := err.(*pq.Error)
 
-	if ok && pqError.Code == foreignKeyError {
+	if keyNotExisted(err) {
 		return ErrCategoryNotExisted
 	}
+
 	return err
 }
 
@@ -48,9 +55,8 @@ func (s *pgService) Update(_ context.Context, p *domain.Book) (*domain.Book, err
 	old.Description = p.Description
 
 	err := s.db.Save(&old).Error
-	pqError, ok := err.(*pq.Error)
 
-	if ok && pqError.Code == foreignKeyError {
+	if keyNotExisted(err) {
 		return &old, ErrCategoryNotExisted
 	}
 
