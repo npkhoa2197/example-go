@@ -27,11 +27,7 @@ func (s *pgService) Create(_ context.Context, p *domain.Category) error {
 	err := s.db.Create(p).Error
 	pqError, ok := err.(*pq.Error)
 
-	if !ok {
-		return err
-	}
-
-	if pqError.Code == uniqueError {
+	if ok && pqError.Code == uniqueError {
 		return ErrCategoryExisted
 	}
 
@@ -53,11 +49,7 @@ func (s *pgService) Update(_ context.Context, p *domain.Category) (*domain.Categ
 	err := s.db.Save(&old).Error
 	pqError, ok := err.(*pq.Error)
 
-	if !ok {
-		return nil, err
-	}
-
-	if pqError.Code == uniqueError {
+	if ok && pqError.Code == uniqueError {
 		return nil, ErrCategoryExisted
 	}
 
