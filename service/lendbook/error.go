@@ -15,6 +15,7 @@ var (
 )
 
 const foreignKeyError = "23503"
+const nullError = "23502"
 
 type errNotFound struct{}
 

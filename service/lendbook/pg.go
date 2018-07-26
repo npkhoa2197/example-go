@@ -21,20 +21,35 @@ func NewPGService(db *gorm.DB) Service {
 	}
 }
 
+// Validate foreign key constraint error return from pg. True if there is an error on FK, false otherwise
+func keyNotExisted(err error) bool {
+	pqError, ok := err.(*pq.Error)
+
+	return ok && pqError.Code == foreignKeyError
+}
+
+// Validate null constraint error return from pg. True if there is a null field, false otherwise
+func isNull(err error) bool {
+	pqError, ok := err.(*pq.Error)
+
+	return ok && pqError.Code == nullError
+}
+
 // Create implement Create for LendBookRecord service
 func (s *pgService) Create(_ context.Context, p *domain.LendBookRecord) error {
 	if err := s.db.Where("book_id = ?", p.BookID).Find(&domain.LendBookRecord{}).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			createError := s.db.Create(p).Error
-			pqError, ok := createError.(*pq.Error)
+			_err := s.db.Create(p).Error
 
-			if ok {
-				if pqError.Code == foreignKeyError {
-					return ErrNotExisted
-				}
+			if keyNotExisted(_err) {
+				return ErrNotExisted
 			}
 
-			return createError
+			if isNull(_err) {
+				return ErrFieldIsRequired
+			}
+
+			return _err
 		}
 		return err
 	}
@@ -59,15 +74,17 @@ func (s *pgService) Update(_ context.Context, p *domain.LendBookRecord) (*domain
 			old.From = p.From
 			old.To = p.To
 
-			updateError := s.db.Save(&old).Error
-			pqError, ok := updateError.(*pq.Error)
+			_err := s.db.Save(&old).Error
 
-			if ok {
-				if pqError.Code == foreignKeyError {
-					return nil, ErrNotExisted
-				}
+			if keyNotExisted(_err) {
+				return nil, ErrNotExisted
 			}
-			return nil, updateError
+
+			if isNull(_err) {
+				return nil, ErrFieldIsRequired
+			}
+
+			return nil, _err
 		}
 		return nil, err
 	}
